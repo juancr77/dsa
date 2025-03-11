@@ -6,6 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 function SocialIcons() {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner
 
   // Inicializa EmailJS con tu Public Key
   emailjs.init('UJjjjsahnefmVXmvo'); // Reemplaza 'TU_PUBLIC_KEY' con tu Public Key
@@ -57,14 +58,22 @@ function SocialIcons() {
       return;
     }
 
+    // Activar el spinner y deshabilitar el botón
+    setIsLoading(true);
+
     emailjs.sendForm('service_rgtfjev', 'template_umuizfz', e.target)
       .then((result) => {
         setMessage('Mensaje enviado con éxito. ¡Gracias por contactarnos!');
         setIsError(false);
         e.target.reset();
-      }, (error) => {
+      })
+      .catch((error) => {
         setMessage('Error al enviar el mensaje. Por favor, inténtalo de nuevo.');
         setIsError(true);
+      })
+      .finally(() => {
+        // Desactivar el spinner y habilitar el botón
+        setIsLoading(false);
       });
   };
 
@@ -107,7 +116,12 @@ function SocialIcons() {
           <textarea id="subject" name="subject" rows="4"></textarea>
         </div>
 
-        <button type="submit" className="submit-button">Enviar</button>
+        <button type="submit" className="submit-button" disabled={isLoading}>
+          {isLoading ? 'Enviando...' : 'Enviar'}
+        </button>
+
+        {/* Spinner de carga */}
+        {isLoading && <div className="spinner"></div>}
 
         {message && (
           <div className={`message ${isError ? 'error' : 'success'}`}>
